@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Leads{% endblock %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="mb-0">Leads</h2>
+  <a href="{{ url_for('leads.new') }}" class="btn btn-primary">+ Add Lead</a>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+  <div class="col-auto">
+    <input type="text" name="q" class="form-control" placeholder="Search name, email, company..." value="{{ q }}">
+  </div>
+  <div class="col-auto">
+    <select name="stage" class="form-select">
+      <option value="">All Stages</option>
+      {% for stage in stages %}
+        <option value="{{ stage }}" {% if stage_filter == stage %}selected{% endif %}>{{ stage }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-auto">
+    <button class="btn btn-outline-secondary" type="submit">Filter</button>
+  </div>
+</form>
+
+{% if leads %}
+<table class="table table-hover bg-white">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Company</th>
+      <th>Stage</th>
+      <th>Est. Value</th>
+      <th>Source</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for lead in leads %}
+    <tr>
+      <td>{{ lead.first_name }} {{ lead.last_name }}</td>
+      <td>{{ lead.email or "—" }}</td>
+      <td>{{ lead.company or "—" }}</td>
+      <td>
+        <span class="badge bg-{{ 'success' if lead.stage == 'Won' else 'danger' if lead.stage == 'Lost' else 'primary' }}">
+          {{ lead.stage }}
+        </span>
+      </td>
+      <td>{{ "$%.2f"|format(lead.estimated_value) if lead.estimated_value else "—" }}</td>
+      <td>{{ lead.source or "—" }}</td>
+      <td class="text-end">
+        <a href="{{ url_for('leads.edit', lead_id=lead.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+        <form action="{{ url_for('leads.delete', lead_id=lead.id) }}" method="post" class="d-inline"
+              onsubmit="return confirm('Delete this lead?');">
+          <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="text-muted">No leads found.</p>
+{% endif %}
+
+{% endblock %}
