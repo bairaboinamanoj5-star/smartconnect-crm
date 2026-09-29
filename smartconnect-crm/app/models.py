@@ -19,3 +19,26 @@ class User(db.Model, UserMixin):
 
     def __repr__(self):
         return f"<User {self.email} ({self.role})>"
+class Contact(db.Model):
+    __tablename__ = "contacts"
+
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(120), nullable=True)
+    phone = db.Column(db.String(20), nullable=True)
+    company = db.Column(db.String(100), nullable=True)
+    product_interest = db.Column(
+        db.Enum("Phone", "Laptop", "Tablet", "Accessory", "Other", name="product_interest_types"),
+        nullable=True,
+    )
+    notes = db.Column(db.Text, nullable=True)
+
+    owner_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    owner = db.relationship("User", backref=db.backref("contacts", lazy=True))
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f"<Contact {self.first_name} {self.last_name}>"

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Contacts{% endblock %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="mb-0">Contacts</h2>
+  <a href="{{ url_for('contacts.new') }}" class="btn btn-primary">+ Add Contact</a>
+</div>
+
+<form method="get" class="mb-3">
+  <div class="input-group" style="max-width: 400px;">
+    <input type="text" name="q" class="form-control" placeholder="Search name, email, company..." value="{{ q }}">
+    <button class="btn btn-outline-secondary" type="submit">Search</button>
+  </div>
+</form>
+
+{% if contacts %}
+<table class="table table-hover bg-white">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Phone</th>
+      <th>Company</th>
+      <th>Interest</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for contact in contacts %}
+    <tr>
+      <td>{{ contact.first_name }} {{ contact.last_name }}</td>
+      <td>{{ contact.email or "—" }}</td>
+      <td>{{ contact.phone or "—" }}</td>
+      <td>{{ contact.company or "—" }}</td>
+      <td>{{ contact.product_interest or "—" }}</td>
+      <td class="text-end">
+        <a href="{{ url_for('contacts.edit', contact_id=contact.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+        <form action="{{ url_for('contacts.delete', contact_id=contact.id) }}" method="post" class="d-inline"
+              onsubmit="return confirm('Delete this contact?');">
+          <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="text-muted">No contacts found{% if q %} for "{{ q }}"{% endif %}.</p>
+{% endif %}
+
+{% endblock %}
