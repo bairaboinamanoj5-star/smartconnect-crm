@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Email Templates{% endblock %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="mb-0">Email Templates</h2>
+  <a href="{{ url_for('email_templates.new') }}" class="btn btn-primary">+ New Template</a>
+</div>
+
+<form method="get" class="mb-3">
+  <div class="input-group" style="max-width: 400px;">
+    <input type="text" name="q" class="form-control" placeholder="Search name or subject..." value="{{ q }}">
+    <button class="btn btn-outline-secondary" type="submit">Search</button>
+  </div>
+</form>
+
+{% if templates %}
+<table class="table table-hover bg-white">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Subject</th>
+      <th>Created By</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for template in templates %}
+    <tr>
+      <td>{{ template.name }}</td>
+      <td>{{ template.subject }}</td>
+      <td>{{ template.owner.first_name }} {{ template.owner.last_name }}</td>
+      <td class="text-end">
+        <a href="{{ url_for('email_templates.edit', template_id=template.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+        {% if current_user.is_admin() or template.owner_id == current_user.id %}
+        <form action="{{ url_for('email_templates.delete', template_id=template.id) }}" method="post" class="d-inline"
+              onsubmit="return confirm('Delete this template?');">
+          <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="text-muted">No email templates yet.</p>
+{% endif %}
+
+{% endblock %}

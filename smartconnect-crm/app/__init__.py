@@ -30,11 +30,13 @@ def create_app():
     from app.routes.contacts import contacts_bp
     from app.routes.leads import leads_bp
     from app.routes.activities import activities_bp
+    from app.routes.email_templates import email_templates_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(contacts_bp)
     app.register_blueprint(leads_bp)
     app.register_blueprint(activities_bp)
+    app.register_blueprint(email_templates_bp)
 
     return app
