@@ -1,0 +1,171 @@
+/* ===== SmartConnect CRM — Light Theme, Navy Sidebar ===== */
+
+:root {
+  --sc-navy: #0b1f3a;
+  --sc-navy-2: #12294f;
+  --sc-accent: #ff7a29;
+  --sc-accent-dark: #e5641a;
+  --sc-bg: #f5f7fa;
+  --sc-surface: #ffffff;
+  --sc-border: #e2e6ed;
+  --sc-text: #1f2937;
+  --sc-text-muted: #6b7280;
+  --sc-sidebar-text: #c7d2e0;
+  --sc-radius: 12px;
+}
+
+body {
+  background: var(--sc-bg);
+  color: var(--sc-text);
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  margin: 0;
+}
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--sc-bg); }
+::-webkit-scrollbar-thumb { background: #d1d7e0; border-radius: 8px; }
+
+/* ===== Sidebar layout ===== */
+.sc-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sc-sidebar {
+  width: 250px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, var(--sc-navy), #08182e);
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.sc-sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 32px;
+  padding: 0 8px;
+}
+
+.sc-logo-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--sc-accent);
+  box-shadow: 0 0 12px var(--sc-accent);
+}
+
+.sc-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.sc-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: var(--sc-sidebar-text);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.92rem;
+  transition: all 0.15s ease;
+}
+.sc-nav-link i { width: 18px; text-align: center; }
+.sc-nav-link:hover { background: rgba(255,255,255,0.06); color: #ffffff; }
+.sc-nav-link.active {
+  background: rgba(255, 122, 41, 0.15);
+  color: var(--sc-accent);
+  box-shadow: inset 3px 0 0 var(--sc-accent);
+}
+
+.sc-sidebar-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  margin-top: 16px;
+}
+.sc-user { display: flex; align-items: center; gap: 10px; }
+.sc-user-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--sc-accent);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; color: #ffffff;
+}
+.sc-user-name { font-size: 0.85rem; font-weight: 600; color: #ffffff; }
+.sc-user-role { font-size: 0.72rem; color: var(--sc-sidebar-text); text-transform: capitalize; }
+.sc-logout-btn { color: var(--sc-sidebar-text); font-size: 1.1rem; transition: color 0.15s ease; }
+.sc-logout-btn:hover { color: #ff5c7a; }
+
+.sc-main { flex: 1; overflow-y: auto; background: var(--sc-bg); }
+.sc-content { padding: 32px 40px; max-width: 1200px; margin: 0 auto; }
+
+/* Guest pages (login/register) — no sidebar, centered card */
+.sc-main-guest {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255,122,41,0.08), transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(11,31,58,0.06), transparent 40%),
+    var(--sc-bg);
+}
+.sc-main-guest .sc-content {
+  width: 100%;
+  max-width: 420px;
+  padding: 0;
+}
+
+/* ===== Cards / tables ===== */
+.card, .table-responsive, table {
+  background: var(--sc-surface) !important;
+  border: 1px solid var(--sc-border) !important;
+  border-radius: var(--sc-radius) !important;
+  color: var(--sc-text) !important;
+}
+table thead th {
+  background: #f0f2f5 !important;
+  color: var(--sc-navy) !important;
+  border-bottom: 1px solid var(--sc-border) !important;
+}
+table tbody tr:hover { background: rgba(255, 122, 41, 0.05) !important; }
+
+/* ===== Buttons ===== */
+.btn-primary {
+  background: var(--sc-accent);
+  border: none;
+  font-weight: 600;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.btn-primary:hover {
+  background: var(--sc-accent-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(255, 122, 41, 0.3);
+}
+
+/* ===== Forms ===== */
+.form-control, .form-select {
+  background: var(--sc-surface) !important;
+  border: 1px solid var(--sc-border) !important;
+  color: var(--sc-text) !important;
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--sc-accent) !important;
+  box-shadow: 0 0 0 3px rgba(255, 122, 41, 0.15) !important;
+}
+
+.badge { border-radius: 999px; padding: 0.4em 0.9em; font-weight: 500; }
