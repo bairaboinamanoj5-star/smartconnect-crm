@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}{{ "Edit Activity" if activity else "Log Activity" }}{% endblock %}
+{% block content %}
+
+<h2>{{ "Edit Activity" if activity else "Log Activity" }}</h2>
+
+<form method="post" class="bg-white p-4 rounded shadow-sm" style="max-width: 600px;">
+  <div class="mb-3">
+    <label class="form-label">Type</label>
+    <select name="activity_type" class="form-select">
+      {% for t in types %}
+        <option value="{{ t }}" {% if activity and activity.activity_type == t %}selected{% endif %}>{{ t }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Subject</label>
+    <input type="text" name="subject" class="form-control" required
+           value="{{ activity.subject if activity else '' }}">
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Related Contact (optional)</label>
+    <select name="contact_id" class="form-select">
+      <option value="">-- None --</option>
+      {% for c in contacts %}
+        <option value="{{ c.id }}" {% if activity and activity.contact_id == c.id %}selected{% endif %}>
+          {{ c.first_name }} {{ c.last_name }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Related Lead (optional)</label>
+    <select name="lead_id" class="form-select">
+      <option value="">-- None --</option>
+      {% for l in leads %}
+        <option value="{{ l.id }}" {% if activity and activity.lead_id == l.id %}selected{% endif %}>
+          {{ l.first_name }} {{ l.last_name }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Description</label>
+    <textarea name="description" class="form-control" rows="3">{{ activity.description if activity else '' }}</textarea>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Save</button>
+  <a href="{{ url_for('activities.index') }}" class="btn btn-secondary">Cancel</a>
+</form>
+
+{% endblock %}

@@ -79,3 +79,29 @@ class Lead(db.Model):
 
     def __repr__(self):
         return f"<Lead {self.first_name} {self.last_name} ({self.stage})>"
+
+class Activity(db.Model):
+    __tablename__ = "activities"
+
+    id = db.Column(db.Integer, primary_key=True)
+    activity_type = db.Column(
+        db.Enum("Call", "Email", "Meeting", "Note", name="activity_types"),
+        nullable=False,
+    )
+    subject = db.Column(db.String(150), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    activity_date = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    contact_id = db.Column(db.Integer, db.ForeignKey("contacts.id"), nullable=True)
+    contact = db.relationship("Contact", backref=db.backref("activities", lazy=True))
+
+    lead_id = db.Column(db.Integer, db.ForeignKey("leads.id"), nullable=True)
+    lead = db.relationship("Lead", backref=db.backref("activities", lazy=True))
+
+    owner_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    owner = db.relationship("User", backref=db.backref("activities", lazy=True))
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"<Activity {self.activity_type}: {self.subject}>"
