@@ -36,6 +36,9 @@
         <a class="sc-nav-link {% if request.endpoint == 'email_templates.index' %}active{% endif %}" href="{{ url_for('email_templates.index') }}">
           <i class="bi bi-envelope-paper-fill"></i> Email Templates
         </a>
+         <a class="sc-nav-link {% if request.endpoint == 'ai_email.generate' %}active{% endif %}" href="{{ url_for('ai_email.generate') }}">
+          <i class="bi bi-stars"></i> AI Email Generator
+        </a>
       </nav>
 
       <div class="sc-sidebar-footer">

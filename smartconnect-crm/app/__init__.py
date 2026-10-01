@@ -8,7 +8,6 @@ db = SQLAlchemy()
 bcrypt = Bcrypt()
 login_manager = LoginManager()
 
-
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
@@ -31,6 +30,7 @@ def create_app():
     from app.routes.leads import leads_bp
     from app.routes.activities import activities_bp
     from app.routes.email_templates import email_templates_bp
+    from app.routes.ai_email import ai_email_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
@@ -38,5 +38,6 @@ def create_app():
     app.register_blueprint(leads_bp)
     app.register_blueprint(activities_bp)
     app.register_blueprint(email_templates_bp)
+    app.register_blueprint(ai_email_bp)
 
     return app

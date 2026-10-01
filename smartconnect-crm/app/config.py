@@ -9,3 +9,4 @@ class Config:
         "DATABASE_URL", "mysql+pymysql://root:password@localhost:3306/smartconnect_crm"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
