@@ -25,7 +25,10 @@ def generate():
             try:
                 subject, body = generate_email(recipient_name, purpose, tone, product_interest)
             except Exception as e:
-                flash(f"AI generation failed: {e}", "danger")
+                if "429" in str(e) or "quota" in str(e).lower():
+                    flash("AI service is temporarily rate-limited (free tier allows a few requests per minute). Please wait about 30 seconds and try again.", "warning")
+                else:
+                    flash("AI generation failed. Please try again in a moment.", "danger")
 
     return render_template("ai_email_generate.html", subject=subject, body=body)
 
