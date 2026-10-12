@@ -3,7 +3,37 @@
 {% block content %}
 <h2>Welcome, {{ user.first_name }}</h2>
 <p class="text-muted">You are logged in as <strong>{{ user.role }}</strong>.</p>
-<div class="alert alert-success">
-  Authentication is working. Contacts, Leads, Activities, and AI modules plug in from here.
+
+<div class="row g-3 mb-4">
+  {% for label, value, icon in [
+    ('Contacts', contact_count, 'bi-people'),
+    ('Leads', lead_count, 'bi-funnel'),
+    ('Won deals', won_count, 'bi-trophy'),
+    ('Activities', activity_count, 'bi-clock-history')
+  ] %}
+  <div class="col-6 col-lg-3">
+    <div class="card border-0 shadow-sm h-100" style="border-left:4px solid #ff7a29 !important;">
+      <div class="card-body">
+        <div class="text-muted small"><i class="bi {{ icon }}"></i> {{ label }}</div>
+        <div style="font-size:2.2rem;font-weight:700;color:#0b1f3a;">{{ value }}</div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <h5 class="mb-3">Leads by pipeline stage</h5>
+    {% for stage, count in stage_counts %}
+    <div class="d-flex align-items-center mb-2">
+      <div style="width:140px;">{{ stage }}</div>
+      <div class="flex-grow-1 me-3" style="background:#eef2f7;border-radius:6px;height:18px;">
+        <div style="width:{{ (count / max_count * 100)|round|int }}%;background:#ff7a29;height:18px;border-radius:6px;"></div>
+      </div>
+      <div style="width:30px;text-align:right;"><strong>{{ count }}</strong></div>
+    </div>
+    {% endfor %}
+  </div>
 </div>
 {% endblock %}
