@@ -43,6 +43,9 @@
           <i class="bi bi-send-check-fill"></i> Email History
         </a>
       </nav>
+        <a class="sc-nav-link {% if request.endpoint and request.endpoint.startswith('data_io') %}active{% endif %}" href="{{ url_for('data_io.index') }}">
+          <i class="bi bi-arrow-down-up"></i> Import / Export
+        </a>
 
       <div class="sc-sidebar-footer">
         <div class="sc-user">

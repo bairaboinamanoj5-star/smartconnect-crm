@@ -31,6 +31,7 @@ def create_app():
     from app.routes.activities import activities_bp
     from app.routes.email_templates import email_templates_bp
     from app.routes.ai_email import ai_email_bp
+    from app.routes.data_io import data_io_bp  # NEW
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
@@ -39,5 +40,6 @@ def create_app():
     app.register_blueprint(activities_bp)
     app.register_blueprint(email_templates_bp)
     app.register_blueprint(ai_email_bp)
+    app.register_blueprint(data_io_bp)  # NEW
 
     return app

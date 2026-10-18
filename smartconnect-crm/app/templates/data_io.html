@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Import / Export{% endblock %}
+{% block content %}
+
+<h2 class="sc-page-title">Import / Export</h2>
+<p class="sc-page-subtitle">Move contacts and leads in and out of SmartConnect using CSV files.</p>
+
+<div class="row g-4">
+
+  <div class="col-lg-6">
+    <div class="card p-4 h-100">
+      <h5 class="mb-3"><i class="bi bi-download"></i> Export</h5>
+      <p class="text-muted">Download your data as a CSV file that opens in Excel or Google Sheets.</p>
+      <div class="d-flex gap-2 flex-wrap">
+        <a class="btn btn-primary" href="{{ url_for('data_io.export_contacts') }}">Export Contacts</a>
+        <a class="btn btn-primary" href="{{ url_for('data_io.export_leads') }}">Export Leads</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card p-4 h-100">
+      <h5 class="mb-3"><i class="bi bi-file-earmark-arrow-down"></i> CSV templates</h5>
+      <p class="text-muted">Download a sample file with the correct column names, then fill it in.</p>
+      <div class="d-flex gap-2 flex-wrap">
+        <a class="btn btn-outline-secondary" href="{{ url_for('data_io.template', kind='contacts') }}">Contacts template</a>
+        <a class="btn btn-outline-secondary" href="{{ url_for('data_io.template', kind='leads') }}">Leads template</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card p-4 h-100">
+      <h5 class="mb-3"><i class="bi bi-upload"></i> Import contacts</h5>
+      <p class="text-muted small mb-2">Required columns: <code>first_name</code>, <code>last_name</code>. Optional: email, phone, company, product_interest, notes. Rows with an email that already exists are skipped.</p>
+      <form method="POST" action="{{ url_for('data_io.import_contacts') }}" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".csv" class="form-control mb-3" required>
+        <button type="submit" class="btn btn-primary">Import Contacts</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card p-4 h-100">
+      <h5 class="mb-3"><i class="bi bi-upload"></i> Import leads</h5>
+      <p class="text-muted small mb-2">Required columns: <code>first_name</code>, <code>last_name</code>. Optional: email, phone, company, product_interest, stage, source, estimated_value, notes. Stage defaults to New.</p>
+      <form method="POST" action="{{ url_for('data_io.import_leads') }}" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".csv" class="form-control mb-3" required>
+        <button type="submit" class="btn btn-primary">Import Leads</button>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
