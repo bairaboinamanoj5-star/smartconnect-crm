@@ -3,13 +3,13 @@
 {% block content %}
 
 <h2 class="sc-page-title">AI Email Generator</h2>
-<p class="sc-page-subtitle">Generate a draft email using Gemini AI, then save it as a reusable template.</p>
+<p class="sc-page-subtitle">Generate a draft email using Gemini AI, then send it or save it as a reusable template.</p>
 
 <div class="card p-4 mb-4">
-  <form method="POST">
+  <form method="POST" action="{{ url_for('ai_email.generate') }}">
     <div class="mb-3">
       <label class="form-label">Recipient Name</label>
-      <input type="text" name="recipient_name" class="form-control" placeholder="e.g. John Smith" required>
+      <input type="text" name="recipient_name" class="form-control" placeholder="e.g. John Smith" value="{{ recipient_name or '' }}" required>
     </div>
     <div class="mb-3">
       <label class="form-label">Purpose</label>
@@ -34,11 +34,7 @@
 {% if subject %}
 <div class="card p-4">
   <h4 class="mb-3">Generated Draft</h4>
-  <form method="POST" action="{{ url_for('ai_email.save_template') }}">
-    <div class="mb-3">
-      <label class="form-label">Template Name</label>
-      <input type="text" name="name" class="form-control" placeholder="e.g. Laptop Follow-up" required>
-    </div>
+  <form method="POST" action="{{ url_for('ai_email.send') }}">
     <div class="mb-3">
       <label class="form-label">Subject</label>
       <input type="text" name="subject" class="form-control" value="{{ subject }}" required>
@@ -47,9 +43,49 @@
       <label class="form-label">Body</label>
       <textarea name="body" class="form-control" rows="8" required>{{ body }}</textarea>
     </div>
-    <button type="submit" class="btn btn-primary">Save as Email Template</button>
+
+    <hr>
+    <h5 class="mb-3">Send this email</h5>
+    <div class="mb-3">
+      <label class="form-label">Send to a contact (optional)</label>
+      <select name="contact_id" id="contactSelect" class="form-select">
+        <option value="">Choose a contact...</option>
+        {% for c in contacts %}
+        <option value="{{ c.id }}" data-email="{{ c.email }}" data-name="{{ c.first_name }} {{ c.last_name }}">{{ c.first_name }} {{ c.last_name }} ({{ c.email }})</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Recipient Email</label>
+        <input type="email" name="recipient_email" id="recipientEmail" class="form-control" placeholder="name@example.com">
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Recipient Name</label>
+        <input type="text" name="recipient_name" id="recipientName" class="form-control" value="{{ recipient_name or '' }}">
+      </div>
+    </div>
+
+    <hr>
+    <div class="mb-3">
+      <label class="form-label">Template Name (only needed to save as a template)</label>
+      <input type="text" name="name" class="form-control" placeholder="e.g. Laptop Follow-up">
+    </div>
+
+    <button type="submit" class="btn btn-primary"><i class="bi bi-send-fill"></i> Send Email</button>
+    <button type="submit" class="btn btn-outline-secondary" formaction="{{ url_for('ai_email.save_template') }}">Save as Email Template</button>
   </form>
 </div>
+
+<script>
+  document.getElementById("contactSelect").addEventListener("change", function () {
+    var opt = this.options[this.selectedIndex];
+    if (opt.value) {
+      document.getElementById("recipientEmail").value = opt.dataset.email;
+      document.getElementById("recipientName").value = opt.dataset.name;
+    }
+  });
+</script>
 {% endif %}
 
 {% endblock %}

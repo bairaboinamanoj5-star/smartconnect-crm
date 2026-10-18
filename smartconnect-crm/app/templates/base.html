@@ -36,8 +36,11 @@
         <a class="sc-nav-link {% if request.endpoint == 'email_templates.index' %}active{% endif %}" href="{{ url_for('email_templates.index') }}">
           <i class="bi bi-envelope-paper-fill"></i> Email Templates
         </a>
-         <a class="sc-nav-link {% if request.endpoint == 'ai_email.generate' %}active{% endif %}" href="{{ url_for('ai_email.generate') }}">
+        <a class="sc-nav-link {% if request.endpoint == 'ai_email.generate' %}active{% endif %}" href="{{ url_for('ai_email.generate') }}">
           <i class="bi bi-stars"></i> AI Email Generator
+        </a>
+        <a class="sc-nav-link {% if request.endpoint == 'ai_email.history' %}active{% endif %}" href="{{ url_for('ai_email.history') }}">
+          <i class="bi bi-send-check-fill"></i> Email History
         </a>
       </nav>
 

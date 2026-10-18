@@ -122,3 +122,23 @@ class EmailTemplate(db.Model):
 
     def __repr__(self):
         return f"<EmailTemplate {self.name}>"
+class EmailHistory(db.Model):
+    __tablename__ = "email_history"
+
+    id = db.Column(db.Integer, primary_key=True)
+    recipient_email = db.Column(db.String(150), nullable=False)
+    recipient_name = db.Column(db.String(100))
+    subject = db.Column(db.String(200), nullable=False)
+    body = db.Column(db.Text, nullable=False)
+    status = db.Column(db.String(20), nullable=False, default="sent")  # sent / failed
+    error_message = db.Column(db.Text)
+    sent_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    owner_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    owner = db.relationship("User", backref=db.backref("email_history", lazy=True))
+
+    contact_id = db.Column(db.Integer, db.ForeignKey("contacts.id"), nullable=True)
+    contact = db.relationship("Contact", backref=db.backref("email_history", lazy=True))
+
+    def __repr__(self):
+        return f"<EmailHistory {self.recipient_email} {self.status}>"
