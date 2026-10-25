@@ -22,7 +22,26 @@
   {% endfor %}
 </div>
 
-<div class="card border-0 shadow-sm">
+<div class="row g-3 mb-4">
+  {% for label, value, hint in [
+    ('Conversion rate', conversion_rate ~ '%', 'Won deals out of all leads'),
+    ('Win rate', win_rate ~ '%', 'Won out of closed (won + lost)'),
+    ('Won value', '$' ~ '{:,.0f}'.format(won_value), 'Estimated value of won deals'),
+    ('Open pipeline', '$' ~ '{:,.0f}'.format(pipeline_value), 'Value of leads still in progress')
+  ] %}
+  <div class="col-6 col-lg-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small">{{ label }}</div>
+        <div style="font-size:1.9rem;font-weight:700;color:#0b1f3a;">{{ value }}</div>
+        <div class="text-muted small">{{ hint }}</div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
   <div class="card-body">
     <h5 class="mb-3">Leads by pipeline stage</h5>
     {% for stage, count in stage_counts %}
@@ -34,6 +53,57 @@
       <div style="width:30px;text-align:right;"><strong>{{ count }}</strong></div>
     </div>
     {% endfor %}
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <h5 class="mb-3">Leads by source</h5>
+        {% if source_rows %}
+        {% for name, count, won, conv in source_rows %}
+        <div class="d-flex align-items-center mb-2">
+          <div style="width:120px;">{{ name }}</div>
+          <div class="flex-grow-1 me-3" style="background:#eef2f7;border-radius:6px;height:18px;">
+            <div style="width:{{ (count / max_source * 100)|round|int }}%;background:#ff7a29;height:18px;border-radius:6px;"></div>
+          </div>
+          <div style="width:110px;text-align:right;"><strong>{{ count }}</strong> <span class="text-muted small">({{ conv }}% won)</span></div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p class="text-muted mb-0">No leads yet.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <h5 class="mb-3">{% if user.role == 'admin' %}Sales performance by rep{% else %}Your sales performance{% endif %}</h5>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle mb-0">
+            <thead>
+              <tr><th>Rep</th><th class="text-end">Leads</th><th class="text-end">Won</th><th class="text-end">Win rate</th><th class="text-end">Won value</th></tr>
+            </thead>
+            <tbody>
+              {% for r in rep_rows %}
+              <tr>
+                <td>{{ r.name }}</td>
+                <td class="text-end">{{ r.leads }}</td>
+                <td class="text-end">{{ r.won }}</td>
+                <td class="text-end">{{ r.win_rate }}%</td>
+                <td class="text-end">${{ '{:,.0f}'.format(r.won_value) }}</td>
+              </tr>
+              {% else %}
+              <tr><td colspan="5" class="text-muted">No data yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}
