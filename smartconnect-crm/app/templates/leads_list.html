@@ -32,6 +32,7 @@
       <th>Email</th>
       <th>Company</th>
       <th>Stage</th>
+      <th>Score</th>
       <th>Est. Value</th>
       <th>Source</th>
       <th></th>
@@ -39,6 +40,7 @@
   </thead>
   <tbody>
     {% for lead in leads %}
+    {% set s = scores.get(lead.id) %}
     <tr>
       <td>{{ lead.first_name }} {{ lead.last_name }}</td>
       <td>{{ lead.email or "—" }}</td>
@@ -48,9 +50,20 @@
           {{ lead.stage }}
         </span>
       </td>
+      <td>
+        {% if s %}
+          <span class="badge {{ 'bg-danger' if s.label == 'Hot' else 'bg-warning text-dark' if s.label == 'Warm' else 'bg-secondary' }}"
+                title="Score: {{ s.points }} / 100">{{ s.label }}</span>
+        {% else %}
+          —
+        {% endif %}
+      </td>
       <td>{{ "$%.2f"|format(lead.estimated_value) if lead.estimated_value else "—" }}</td>
       <td>{{ lead.source or "—" }}</td>
       <td class="text-end">
+        <button type="button" class="btn btn-sm btn-outline-primary next-btn"
+                data-id="{{ lead.id }}"
+                data-url="{{ url_for('leads.next_action', lead_id=lead.id) }}">Next action</button>
         <a href="{{ url_for('leads.edit', lead_id=lead.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
         <form action="{{ url_for('leads.delete', lead_id=lead.id) }}" method="post" class="d-inline"
               onsubmit="return confirm('Delete this lead?');">
@@ -58,11 +71,43 @@
         </form>
       </td>
     </tr>
+    <tr id="next-{{ lead.id }}" class="d-none">
+      <td colspan="8" class="bg-light small next-text"></td>
+    </tr>
     {% endfor %}
   </tbody>
 </table>
 {% else %}
 <p class="text-muted">No leads found.</p>
 {% endif %}
+
+<script>
+document.querySelectorAll('.next-btn').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    var row = document.getElementById('next-' + btn.dataset.id);
+    var box = row.querySelector('.next-text');
+    row.classList.remove('d-none');
+    box.textContent = 'Thinking...';
+    btn.disabled = true;
+    fetch(btn.dataset.url, { headers: { 'Accept': 'application/json' } })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        box.textContent = '';
+        var label = document.createElement('strong');
+        label.textContent = 'Suggested next action (' + (d.source || 'info') + '): ';
+        box.appendChild(label);
+        box.appendChild(document.createTextNode(d.text));
+        if (d.note) {
+          var note = document.createElement('div');
+          note.className = 'text-muted';
+          note.textContent = d.note;
+          box.appendChild(note);
+        }
+      })
+      .catch(function () { box.textContent = 'Could not load a suggestion.'; })
+      .finally(function () { btn.disabled = false; });
+  });
+});
+</script>
 
 {% endblock %}

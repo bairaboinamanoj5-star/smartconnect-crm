@@ -43,6 +43,18 @@
 
 <div class="card border-0 shadow-sm mb-4">
   <div class="card-body">
+    <h5 class="mb-3">Lead scoring <span class="text-muted small">(open leads)</span></h5>
+    <div class="d-flex gap-4 flex-wrap">
+      <div><span class="badge bg-danger">Hot</span> <strong class="fs-4 ms-1">{{ score_counts.Hot }}</strong></div>
+      <div><span class="badge bg-warning text-dark">Warm</span> <strong class="fs-4 ms-1">{{ score_counts.Warm }}</strong></div>
+      <div><span class="badge bg-secondary">Cold</span> <strong class="fs-4 ms-1">{{ score_counts.Cold }}</strong></div>
+    </div>
+    <div class="text-muted small mt-2">Scored from stage, estimated value, source and recent activity. See the Leads page for each lead.</div>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-body">
     <h5 class="mb-3">Leads by pipeline stage</h5>
     {% for stage, count in stage_counts %}
     <div class="d-flex align-items-center mb-2">

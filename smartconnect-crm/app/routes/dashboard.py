@@ -4,6 +4,7 @@ from sqlalchemy import func
 
 from app import db
 from app.models import Contact, Lead, Activity, User
+from app.services.lead_ai import score_lead
 
 dashboard_bp = Blueprint("dashboard", __name__)
 
@@ -52,6 +53,22 @@ def index():
     pipeline_value = float(sum(
         (l.estimated_value or 0) for l in leads if l.stage not in ("Won", "Lost")
     ))
+
+    # Lead scoring counts (open leads only)
+    last_map = {}
+    if leads:
+        act_rows = (
+            db.session.query(Activity.lead_id, func.max(Activity.activity_date))
+            .filter(Activity.lead_id.in_([l.id for l in leads]))
+            .group_by(Activity.lead_id)
+            .all()
+        )
+        last_map = dict(act_rows)
+    score_counts = {"Hot": 0, "Warm": 0, "Cold": 0}
+    for l in leads:
+        sc = score_lead(l, last_map.get(l.id))
+        if sc:
+            score_counts[sc["label"]] += 1
 
     # Leads by source
     src = {}
@@ -109,6 +126,7 @@ def index():
         win_rate=win_rate,
         won_value=won_value,
         pipeline_value=pipeline_value,
+        score_counts=score_counts,
         source_rows=source_rows,
         max_source=max_source,
         rep_rows=rep_rows,

@@ -1,7 +1,9 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required, current_user
+from sqlalchemy import func
 from app import db
-from app.models import Lead
+from app.models import Lead, Activity
+from app.services.lead_ai import score_lead, suggest_next_action, fallback_next_action
 
 leads_bp = Blueprint("leads", __name__, url_prefix="/leads")
 
@@ -39,7 +41,51 @@ def index():
         )
 
     leads = query.order_by(Lead.created_at.desc()).all()
-    return render_template("leads_list.html", leads=leads, q=q, stage_filter=stage_filter, stages=STAGES)
+
+    # Lead scores (Hot / Warm / Cold)
+    last_map = {}
+    ids = [l.id for l in leads]
+    if ids:
+        rows = (
+            db.session.query(Activity.lead_id, func.max(Activity.activity_date))
+            .filter(Activity.lead_id.in_(ids))
+            .group_by(Activity.lead_id)
+            .all()
+        )
+        last_map = dict(rows)
+    scores = {l.id: score_lead(l, last_map.get(l.id)) for l in leads}
+
+    return render_template(
+        "leads_list.html", leads=leads, q=q, stage_filter=stage_filter, stages=STAGES, scores=scores
+    )
+
+
+@leads_bp.route("/<int:lead_id>/next-action")
+@login_required
+def next_action(lead_id):
+    lead = Lead.query.get_or_404(lead_id)
+
+    if not current_user.is_admin() and lead.owner_id != current_user.id:
+        return jsonify(ok=False, text="You don't have permission to view that lead."), 403
+
+    count = Activity.query.filter_by(lead_id=lead.id).count()
+    last = (
+        db.session.query(func.max(Activity.activity_date))
+        .filter(Activity.lead_id == lead.id)
+        .scalar()
+    )
+
+    try:
+        text = suggest_next_action(lead, last, count)
+        return jsonify(ok=True, source="AI", text=text)
+    except Exception as exc:
+        limited = "429" in str(exc) or "quota" in str(exc).lower()
+        note = (
+            "AI is rate-limited right now (wait about 30 seconds); showing a rule-based suggestion."
+            if limited
+            else "AI is unavailable right now; showing a rule-based suggestion."
+        )
+        return jsonify(ok=True, source="Rules", text=fallback_next_action(lead), note=note)
 
 
 @leads_bp.route("/new", methods=["GET", "POST"])
