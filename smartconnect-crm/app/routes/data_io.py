@@ -146,7 +146,7 @@ def import_contacts():
 
     existing = {
         c.email.lower()
-        for c in Contact.query.filter_by(owner_id=current_user.id)
+        for c in _visible(Contact)
         if c.email
     }
     imported = skipped = 0
@@ -195,7 +195,7 @@ def import_leads():
 
     existing = {
         ((l.first_name or "").lower(), (l.last_name or "").lower(), (l.email or "").lower())
-        for l in Lead.query.filter_by(owner_id=current_user.id)
+        for l in _visible(Lead)
     }
     imported = skipped = 0
 
