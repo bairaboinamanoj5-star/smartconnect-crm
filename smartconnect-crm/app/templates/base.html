@@ -48,6 +48,11 @@
         <a class="sc-nav-link {% if request.endpoint == 'ai_settings.usage' %}active{% endif %}" href="{{ url_for('ai_settings.usage') }}">
           <i class="bi bi-graph-up"></i> AI Usage
         </a>
+        {% if current_user.is_admin() %}
+        <a class="sc-nav-link {% if request.endpoint and request.endpoint.startswith('users.') %}active{% endif %}" href="{{ url_for('users.index') }}">
+          <i class="bi bi-people-fill"></i> Users
+        </a>
+        {% endif %}
       </nav>
         <a class="sc-nav-link {% if request.endpoint and request.endpoint.startswith('data_io') %}active{% endif %}" href="{{ url_for('data_io.index') }}">
           <i class="bi bi-arrow-down-up"></i> Import / Export

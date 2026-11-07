@@ -16,7 +16,9 @@ def register():
         last_name = request.form.get("last_name", "").strip()
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
-        role = request.form.get("role", "sales_rep")
+        # Security: self-registration is always a sales rep.
+        # Only an admin can promote a user (Users page).
+        role = "sales_rep"
 
         if not first_name or not last_name or not email or not password:
             flash("All fields are required.", "danger")

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Users - SmartConnect CRM{% endblock %}
+{% block content %}
+<h1 class="mb-1">Users</h1>
+<p class="text-muted">Administrators can see every account and change roles. New accounts always start as Sales Representatives. You cannot change your own role, so there is always at least one administrator.</p>
+
+<div class="card"><div class="card-body">
+  <div class="table-responsive">
+  <table class="table align-middle mb-0">
+    <thead>
+      <tr><th>Name</th><th>Email</th><th class="text-end">Leads</th><th>Joined</th><th>Role</th></tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td>{{ u.first_name }} {{ u.last_name }}{% if u.id == current_user.id %} <span class="badge text-bg-secondary">You</span>{% endif %}</td>
+        <td>{{ u.email }}</td>
+        <td class="text-end">{{ lead_counts.get(u.id, 0) }}</td>
+        <td>{{ u.created_at.strftime("%Y-%m-%d") if u.created_at else "-" }}</td>
+        <td>
+          {% if u.id == current_user.id %}
+            {{ roles[u.role] }}
+          {% else %}
+          <form method="post" action="{{ url_for('users.change_role', user_id=u.id) }}" class="d-flex gap-2">
+            <select name="role" class="form-select form-select-sm" style="min-width: 190px;">
+              {% for key, label in roles.items() %}
+                <option value="{{ key }}" {% if u.role == key %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+            <button class="btn btn-sm btn-outline-primary" type="submit">Save</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div></div>
+{% endblock %}
