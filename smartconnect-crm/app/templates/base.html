@@ -42,6 +42,12 @@
         <a class="sc-nav-link {% if request.endpoint == 'ai_email.history' %}active{% endif %}" href="{{ url_for('ai_email.history') }}">
           <i class="bi bi-send-check-fill"></i> Email History
         </a>
+        <a class="sc-nav-link {% if request.endpoint == 'ai_settings.settings' %}active{% endif %}" href="{{ url_for('ai_settings.settings') }}">
+          <i class="bi bi-sliders"></i> AI Settings
+        </a>
+        <a class="sc-nav-link {% if request.endpoint == 'ai_settings.usage' %}active{% endif %}" href="{{ url_for('ai_settings.usage') }}">
+          <i class="bi bi-graph-up"></i> AI Usage
+        </a>
       </nav>
         <a class="sc-nav-link {% if request.endpoint and request.endpoint.startswith('data_io') %}active{% endif %}" href="{{ url_for('data_io.index') }}">
           <i class="bi bi-arrow-down-up"></i> Import / Export

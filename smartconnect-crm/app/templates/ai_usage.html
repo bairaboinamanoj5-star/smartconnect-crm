@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}AI Usage - SmartConnect CRM{% endblock %}
+{% block content %}
+<h1 class="mb-1">AI Usage</h1>
+<p class="text-muted">
+  {% if current_user.is_admin() %}All AI calls across all users.{% else %}Your AI calls.{% endif %}
+  Costs are estimates from token counts and approximate public prices.
+</p>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3"><div class="card"><div class="card-body">
+    <div class="text-muted small">Calls</div><div class="h3 mb-0">{{ totals[0] }}</div></div></div></div>
+  <div class="col-6 col-lg-3"><div class="card"><div class="card-body">
+    <div class="text-muted small">Input tokens</div><div class="h3 mb-0">{{ "{:,}".format(totals[1]|int) }}</div></div></div></div>
+  <div class="col-6 col-lg-3"><div class="card"><div class="card-body">
+    <div class="text-muted small">Output tokens</div><div class="h3 mb-0">{{ "{:,}".format(totals[2]|int) }}</div></div></div></div>
+  <div class="col-6 col-lg-3"><div class="card"><div class="card-body">
+    <div class="text-muted small">Estimated cost</div><div class="h3 mb-0">${{ "%.4f"|format(totals[3]|float) }}</div></div></div></div>
+</div>
+
+<div class="row g-4 mb-4">
+  <div class="col-lg-{% if by_user %}6{% else %}12{% endif %}">
+    <div class="card"><div class="card-body">
+      <h2 class="h5">By model</h2>
+      <table class="table table-sm mb-0">
+        <thead><tr><th>Provider</th><th>Model</th><th class="text-end">Calls</th><th class="text-end">Tokens</th><th class="text-end">Est. cost</th></tr></thead>
+        <tbody>
+          {% for r in by_model %}
+          <tr><td>{{ providers[r[0]].label if r[0] in providers else r[0] }}</td><td>{{ r[1] }}</td>
+              <td class="text-end">{{ r[2] }}</td><td class="text-end">{{ "{:,}".format(r[3]|int) }}</td>
+              <td class="text-end">${{ "%.4f"|format(r[4]|float) }}</td></tr>
+          {% else %}
+          <tr><td colspan="5" class="text-muted">No AI calls yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div></div>
+  </div>
+  {% if by_user %}
+  <div class="col-lg-6">
+    <div class="card"><div class="card-body">
+      <h2 class="h5">By user</h2>
+      <table class="table table-sm mb-0">
+        <thead><tr><th>User</th><th class="text-end">Calls</th><th class="text-end">Tokens</th><th class="text-end">Est. cost</th></tr></thead>
+        <tbody>
+          {% for r in by_user %}
+          <tr><td>{{ r[0] }} {{ r[1] }}</td><td class="text-end">{{ r[2] }}</td>
+              <td class="text-end">{{ "{:,}".format(r[3]|int) }}</td><td class="text-end">${{ "%.4f"|format(r[4]|float) }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div></div>
+  </div>
+  {% endif %}
+</div>
+
+<div class="card"><div class="card-body">
+  <h2 class="h5">Recent calls</h2>
+  <div class="table-responsive">
+  <table class="table table-sm mb-0">
+    <thead><tr><th>Time (UTC)</th>{% if current_user.is_admin() %}<th>User</th>{% endif %}<th>Task</th><th>Model</th><th>Key</th><th class="text-end">Tokens</th><th class="text-end">Est. cost</th><th>Status</th></tr></thead>
+    <tbody>
+      {% for row, name in recent %}
+      <tr>
+        <td>{{ row.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
+        {% if current_user.is_admin() %}<td>{{ name or "-" }}</td>{% endif %}
+        <td>{{ row.task }}</td><td>{{ row.model }}</td><td>{{ row.key_source }}</td>
+        <td class="text-end">{{ row.input_tokens + row.output_tokens }}</td>
+        <td class="text-end">${{ "%.4f"|format(row.est_cost|float) }}</td>
+        <td>{% if row.status == "ok" %}<span class="badge text-bg-success">ok</span>{% else %}<span class="badge text-bg-warning" title="{{ row.error_message or '' }}">{{ row.status }}</span>{% endif %}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="8" class="text-muted">No AI calls yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div></div>
+{% endblock %}

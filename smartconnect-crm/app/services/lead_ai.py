@@ -1,7 +1,6 @@
 from datetime import datetime
 
-import google.generativeai as genai
-from flask import current_app
+from app.services.ai_providers import generate_text
 
 STAGE_POINTS = {"New": 10, "Contacted": 25, "Qualified": 40, "Proposal Sent": 55}
 SOURCE_POINTS = {"Referral": 10, "Walk-in": 10, "Website": 6, "Social Media": 3, "Other": 0}
@@ -50,10 +49,11 @@ def fallback_next_action(lead):
 
 
 def suggest_next_action(lead, last_activity=None, activity_count=0):
-    """Ask Gemini for one next step. Raises on any API error."""
-    genai.configure(api_key=current_app.config.get("GEMINI_API_KEY"))
-    model = genai.GenerativeModel("gemini-flash-latest")
+    """Ask the user's chosen AI provider for one next step.
 
+    Raises AIError on any provider error or after a 10 second timeout,
+    so the caller can fall back to the rule-based suggestion.
+    """
     if last_activity:
         days = (datetime.utcnow() - last_activity).days
         recency = f"{days} day(s) since the last logged activity"
@@ -71,5 +71,4 @@ Estimated value: {lead.estimated_value or 'unknown'}
 Activities logged: {activity_count} ({recency})
 Notes: {(lead.notes or 'none')[:300]}
 """
-    response = model.generate_content(prompt)
-    return response.text.strip()
+    return generate_text("action", prompt, timeout=10)

@@ -19,6 +19,8 @@ class User(db.Model, UserMixin):
 
     def __repr__(self):
         return f"<User {self.email} ({self.role})>"
+
+
 class Contact(db.Model):
     __tablename__ = "contacts"
 
@@ -42,6 +44,7 @@ class Contact(db.Model):
 
     def __repr__(self):
         return f"<Contact {self.first_name} {self.last_name}>"
+
 
 class Lead(db.Model):
     __tablename__ = "leads"
@@ -80,6 +83,7 @@ class Lead(db.Model):
     def __repr__(self):
         return f"<Lead {self.first_name} {self.last_name} ({self.stage})>"
 
+
 class Activity(db.Model):
     __tablename__ = "activities"
 
@@ -105,7 +109,8 @@ class Activity(db.Model):
 
     def __repr__(self):
         return f"<Activity {self.activity_type}: {self.subject}>"
-    
+
+
 class EmailTemplate(db.Model):
     __tablename__ = "email_templates"
 
@@ -122,6 +127,8 @@ class EmailTemplate(db.Model):
 
     def __repr__(self):
         return f"<EmailTemplate {self.name}>"
+
+
 class EmailHistory(db.Model):
     __tablename__ = "email_history"
 
@@ -142,3 +149,45 @@ class EmailHistory(db.Model):
 
     def __repr__(self):
         return f"<EmailHistory {self.recipient_email} {self.status}>"
+
+
+class AISetting(db.Model):
+    """One row per user: which AI provider and models they use, and their own key (encrypted)."""
+    __tablename__ = "ai_settings"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, unique=True)
+    user = db.relationship("User", backref=db.backref("ai_setting", uselist=False))
+
+    provider = db.Column(db.String(20), nullable=False, default="gemini")
+    email_model = db.Column(db.String(60), nullable=True)
+    action_model = db.Column(db.String(60), nullable=True)
+    api_key_enc = db.Column(db.Text, nullable=True)
+
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f"<AISetting user={self.user_id} {self.provider}>"
+
+
+class AIUsage(db.Model):
+    """One row per AI call: who, which model, tokens and estimated cost."""
+    __tablename__ = "ai_usage"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    user = db.relationship("User", backref=db.backref("ai_usage", lazy=True))
+
+    task = db.Column(db.String(20), nullable=False)          # email / action
+    provider = db.Column(db.String(20), nullable=False)
+    model = db.Column(db.String(60), nullable=False)
+    key_source = db.Column(db.String(10), nullable=False)    # user / server
+    input_tokens = db.Column(db.Integer, nullable=False, default=0)
+    output_tokens = db.Column(db.Integer, nullable=False, default=0)
+    est_cost = db.Column(db.Numeric(10, 6), nullable=False, default=0)
+    status = db.Column(db.String(20), nullable=False, default="ok")   # ok / rate_limit / auth / timeout / config / other
+    error_message = db.Column(db.String(200), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"<AIUsage {self.provider}/{self.model} {self.status}>"
