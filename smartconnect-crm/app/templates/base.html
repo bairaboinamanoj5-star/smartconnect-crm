@@ -52,6 +52,9 @@
         <a class="sc-nav-link {% if request.endpoint and request.endpoint.startswith('users.') %}active{% endif %}" href="{{ url_for('users.index') }}">
           <i class="bi bi-people-fill"></i> Users
         </a>
+        <a class="sc-nav-link {% if request.endpoint and request.endpoint.startswith('health.') %}active{% endif %}" href="{{ url_for('health.index') }}">
+          <i class="bi bi-heart-pulse-fill"></i> System Health
+        </a>
         {% endif %}
       </nav>
         <a class="sc-nav-link {% if request.endpoint and request.endpoint.startswith('data_io') %}active{% endif %}" href="{{ url_for('data_io.index') }}">

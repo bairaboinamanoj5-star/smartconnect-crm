@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}System Health - SmartConnect CRM{% endblock %}
+{% block content %}
+<h1 class="mb-1">System Health</h1>
+<p class="text-muted">Administrator view of service status and recent errors. Success rates cover the last 24 hours. Times are UTC.</p>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3"><div class="card"><div class="card-body">
+    <div class="text-muted small">Database</div>
+    <div class="h4 mb-0">{% if db_ok %}<span class="text-success">Connected</span>{% else %}<span class="text-danger">Unreachable</span>{% endif %}</div>
+  </div></div></div>
+  <div class="col-6 col-lg-3"><div class="card"><div class="card-body">
+    <div class="text-muted small">AI calls (24h)</div>
+    <div class="h4 mb-0">{{ ai_total }}</div>
+    <div class="small text-muted">{% if ai_rate is none %}no calls yet{% else %}{{ ai_rate }}% succeeded, {{ ai_failed }} failed{% endif %}</div>
+  </div></div></div>
+  <div class="col-6 col-lg-3"><div class="card"><div class="card-body">
+    <div class="text-muted small">Emails sent (24h)</div>
+    <div class="h4 mb-0">{{ mail_total }}</div>
+    <div class="small text-muted">{% if mail_rate is none %}none yet{% else %}{{ mail_rate }}% delivered, {{ mail_failed }} failed{% endif %}</div>
+  </div></div></div>
+  <div class="col-6 col-lg-3"><div class="card"><div class="card-body">
+    <div class="text-muted small">Records</div>
+    <div class="small">{{ counts.users }} users, {{ counts.contacts }} contacts, {{ counts.leads }} leads</div>
+  </div></div></div>
+</div>
+
+<div class="card mb-4"><div class="card-body">
+  <h2 class="h5">Recent AI errors</h2>
+  <div class="table-responsive">
+  <table class="table table-sm mb-0">
+    <thead><tr><th>Time</th><th>User</th><th>Task</th><th>Model</th><th>Type</th><th>Message</th></tr></thead>
+    <tbody>
+      {% for row, name in ai_errors %}
+      <tr>
+        <td>{{ row.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
+        <td>{{ name or "-" }}</td>
+        <td>{{ row.task }}</td>
+        <td>{{ row.model }}</td>
+        <td><span class="badge text-bg-warning">{{ row.status }}</span></td>
+        <td class="small">{{ row.error_message or "" }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="text-muted">No AI errors recorded.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div></div>
+
+<div class="card"><div class="card-body">
+  <h2 class="h5">Recent failed emails</h2>
+  <div class="table-responsive">
+  <table class="table table-sm mb-0">
+    <thead><tr><th>Time</th><th>Recipient</th><th>Subject</th><th>Error</th></tr></thead>
+    <tbody>
+      {% for m in mail_errors %}
+      <tr>
+        <td>{{ m.sent_at.strftime("%Y-%m-%d %H:%M") if m.sent_at else "-" }}</td>
+        <td>{{ m.recipient_email }}</td>
+        <td>{{ m.subject }}</td>
+        <td class="small">{{ (m.error_message or "")[:160] }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" class="text-muted">No failed emails recorded.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div></div>
+{% endblock %}
