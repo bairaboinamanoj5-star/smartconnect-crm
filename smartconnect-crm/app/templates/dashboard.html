@@ -1,8 +1,46 @@
 {% extends "base.html" %}
 {% block title %}Dashboard{% endblock %}
 {% block content %}
-<h2>Welcome, {{ user.first_name }}</h2>
-<p class="text-muted">You are logged in as <strong>{{ user.role }}</strong>.</p>
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+  <div>
+    <h2>Welcome, {{ user.first_name }}</h2>
+    <p class="text-muted">You are logged in as <strong>{{ user.role }}</strong>.</p>
+  </div>
+  <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#howCalc" aria-expanded="false" aria-controls="howCalc">
+    <i class="bi bi-info-circle"></i> How is this calculated?
+  </button>
+</div>
+
+<div class="collapse mb-4" id="howCalc">
+  <div class="card border-0 shadow-sm"><div class="card-body">
+    <h5 class="mb-2">Where these numbers come from</h5>
+    <p class="mb-3">Every number on this page is calculated live from the CRM database when the page loads. Nothing is hard-coded and there is no forecasting model. Administrators see totals across all users; sales representatives see only their own records. The demonstration data in this system is synthetic (generated test data), so the values illustrate how the formulas behave.</p>
+    <div class="table-responsive">
+    <table class="table table-sm align-middle mb-3">
+      <thead><tr><th style="width:190px;">Metric</th><th>How it is calculated</th></tr></thead>
+      <tbody>
+        <tr><td>Contacts, Leads, Activities</td><td>A count of the records in each table.</td></tr>
+        <tr><td>Won deals</td><td>Number of leads whose stage is Won.</td></tr>
+        <tr><td>Conversion rate</td><td>Won leads divided by all leads, as a percentage.</td></tr>
+        <tr><td>Win rate</td><td>Won leads divided by closed leads (Won plus Lost). Leads still open are left out.</td></tr>
+        <tr><td>Won value</td><td>Sum of the estimated value of leads in the Won stage.</td></tr>
+        <tr><td>Open pipeline</td><td>Sum of the estimated value of leads not yet Won or Lost.</td></tr>
+        <tr><td>Leads by source</td><td>Leads grouped by where they came from. The percentage is the share of that source's leads that were won.</td></tr>
+        <tr><td>Sales performance</td><td>The same leads, won count, win rate and won value, grouped by the sales rep who owns each lead.</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <h6 class="mb-2">Lead scoring (Hot, Warm, Cold)</h6>
+    <p class="mb-1">Open leads get points from simple, explainable rules. This is rule-based, not machine learning.</p>
+    <ul class="mb-2">
+      <li><strong>Stage:</strong> New 10, Contacted 25, Qualified 40, Proposal Sent 55.</li>
+      <li><strong>Estimated value:</strong> 500 or more adds 6, 1,000 or more adds 12, 2,000 or more adds 20.</li>
+      <li><strong>Source:</strong> Referral and Walk-in 10, Website 6, Social Media 3, Other 0.</li>
+      <li><strong>Recent activity:</strong> logged within 7 days adds 15, within 30 days adds 8.</li>
+    </ul>
+    <p class="mb-0 text-muted small">Hot is 65 points or more, Warm is 35 to 64, and Cold is below 35. Won and Lost leads are not scored. The AI next-action suggestion on the Leads page is separate from this score.</p>
+  </div></div>
+</div>
 
 <div class="row g-3 mb-4">
   {% for label, value, icon in [
