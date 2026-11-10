@@ -22,7 +22,7 @@ from app import db
 PROVIDERS = {
     "gemini": {
         "label": "Google Gemini",
-        "default": "gemini-flash-latest",
+        "default": "gemini-flash-lite-latest",  # CHANGED
         "models": {
             "gemini-flash-latest": (0.30, 2.50),
             "gemini-flash-lite-latest": (0.10, 0.40),
@@ -55,7 +55,7 @@ PROVIDERS = {
     },
 }
 
-SERVER_DEFAULT = ("gemini", "gemini-flash-latest")
+SERVER_DEFAULT = ("gemini", "gemini-flash-lite-latest")  # CHANGED
 
 
 class AIError(Exception):
